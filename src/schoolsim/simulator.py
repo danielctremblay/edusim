@@ -16,7 +16,7 @@ class Simulator(object):
     def __init__(self, **kwargs):
         """Initialise le simulateur à partir des paramètres de simulation
 
-        :param kwargs: type, nom, description, auteur, année de début et durée en années.
+        :param kwargs: level, nom, description, auteur, année de début et durée en années.
         """
         logger.info("Simulation, simulating new school system")
         self.id = random.getrandbits(128)
@@ -38,9 +38,9 @@ class Simulator(object):
         return self.describe()
 
     def describe(self):
-        """Retourne une description textuelle de la simulation.
+        """Retourne la description textuelle de l'état du simulateur.
 
-        :return: Retourne une chaîne de caractères décrivant la simulation
+        :return: la description textuelle de l'état du simulateur.
         """
         details = "Simulation: {}\n".format(self.id)
         details += "Name: {}\n".format(self.name)

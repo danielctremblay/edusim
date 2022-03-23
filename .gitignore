@@ -125,7 +125,7 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Pyre type checker
+# Pyre level checker
 .pyre/
 
 # Mac Stuff
