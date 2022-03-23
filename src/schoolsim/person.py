@@ -9,7 +9,7 @@ import logging
 
 import unidecode as unidecode
 
-from simulation.lib.database import Database
+from . lib.database import Database
 
 PEOPLE_ALL = 'people_all'
 
@@ -17,9 +17,18 @@ logger = logging.getLogger(__name__)
 
 
 class Person(ABC):
-    """Person class"""
+    """Définit une personne.
+
+    """
 
     def __init__(self, firstname, lastname, dob, gender):
+        """Initialise une personne.
+
+        :param firstname: le prénom.
+        :param lastname: le nom de famille.
+        :param dob: la date de naissance.
+        :param gender: le genre.
+        """
         self.id = (lastname[0:3] + firstname[0:1] + str(dob.year)).lower()
         self.firstname = firstname
         self.lastname = lastname
@@ -29,9 +38,19 @@ class Person(ABC):
 
 
 class Student(Person):
-    """Student class"""
+    """Initialise un élève.
+
+    """
 
     def __init__(self, firstname, lastname, dob, gender, caseweight=1):
+        """Initialise un élève.
+
+        :param firstname: le prénom.
+        :param lastname: le nom de famille.
+        :param dob: la date de naissance.
+        :param gender: le genre.
+        :param caseweight: la charge correspondante (ex. TDAH, TSA).
+        """
         super().__init__(firstname, lastname, dob, gender)
         self.profile = 'student'
         self.status = 'normal'  # TODO provide profile + headcount + success_factor penality
@@ -48,6 +67,11 @@ class Student(Person):
         return self.descibe()
 
     def describe(self, offset=0):
+        """Retourne la description textuelle de l'état de l'élève.
+
+        :param offset: le nombre de tabulations pour l'indentation du texte.
+        :return: la description textuelle de l'état de l'élève.
+        """
         spacer_0 = "\t" * offset
         spacer_1 = "\t" * (offset + 1)
         details = spacer_0
@@ -64,9 +88,18 @@ class Student(Person):
 
 
 class Teacher(Person):
-    """School staff class"""
+    """Définit une personne enseignante.
+
+    """
 
     def __init__(self, firstname, lastname, dob, gender):
+        """Initialise une personne enseignante.
+
+        :param firstname: le prénom.
+        :param lastname: le nom de famille.
+        :param dob: la date de naissance.
+        :param gender: le genre.
+        """
         today = datetime.date.today()
         super().__init__(firstname, lastname, dob, gender)
         self.profile = 'teacher'
@@ -83,6 +116,11 @@ class Teacher(Person):
         return self.describe()
 
     def describe(self, offset=0):
+        """Retourne la description textuelle de l'état de la personne enseignante.
+
+        :param offset: le nombre de tabulations pour l'indentation du texte.
+        :return: la description textuelle de l'état de la personne enseignante.
+        """
         spacer_0 = "\t" * offset
         spacer_1 = "\t" * (offset + 1)
         details = spacer_0
@@ -99,8 +137,19 @@ class Teacher(Person):
 
 
 class Specialist(Teacher):
+    """Définit une personne enseignante spécialiste (ex. musique, éducation physique).
+
+    """
 
     def __init__(self, firstname, lastname, dob, gender, topic):
+        """Initialiste une personne enseignante spécialiste.
+
+        :param firstname: le prénom.
+        :param lastname: le nom de famille.
+        :param dob: la date de naissance.
+        :param gender: le genre.
+        :param topic: la matière scolaire.
+        """
         super().__init__(firstname, lastname, dob, gender)
         today = datetime.date.today()
         self.profile = 'specialist'
@@ -109,8 +158,14 @@ class Specialist(Teacher):
 
 
 class Pool(ABC):
+    """Définit la classe abstraite de bassin pour la génération de listes cohérentes de personnes.
+
+    """
 
     def __init__(self):
+        """Initialise le bassin.
+
+        """
         pass
 
     @abstractmethod
@@ -119,10 +174,17 @@ class Pool(ABC):
 
     @abstractmethod
     def pop(self):
+        """Retourne une personne dans le bassin.
+
+        :return: une personne dans le bassin.
+        """
         raise NotImplementedError
 
 
 class SpecialistPool(Pool):
+    """Définit le bassin de personnes enseignantes spécialistes.
+
+    """
 
     def __replenish_pool(self):
         pool = []
@@ -132,9 +194,15 @@ class SpecialistPool(Pool):
 
 
 class TeacherPool(Pool):
+    """Définit le bassin de personnes enseignantes non-spécialistes.
+
+    """
     db = None
 
     def __init__(self):
+        """Initialise le bassin de personnes enseignantes non-spécialistes.
+
+        """
         super(Pool, self).__init__()
         self.pool = []
         self.db = Database()
@@ -218,15 +286,25 @@ class TeacherPool(Pool):
             self.pool.append(Teacher(firstname=row[0], lastname=row[1], dob=row[3], gender=row[2]))
 
     def pop(self):
+        """Retourne une personne enseignante non-spécialiste dans le bassin.
+
+        :return: une personne enseignante non-spécialiste dans le bassin.
+        """
         if len(self.pool) == 0:
             self._Pool__replenish_pool()
         return self.pool.pop()
 
 
 class StudentPool(Pool):
+    """Définit le bassin d'élèves.
+
+    """
     db = None
 
     def __init__(self):
+        """Initialise le bassin d'élèves.
+
+        """
         super(Pool, self).__init__()
         self.pool = []
         self.db = Database()
@@ -289,6 +367,10 @@ class StudentPool(Pool):
             self.pool.append(Student(firstname=firsname, lastname=lastname, dob=dob, gender=gender))
 
     def pop(self):
+        """Retourne un élève
+
+        :return: un élève
+        """
         if len(self.pool) == 0:
             self._Pool__replenish_pool()
         return self.pool.pop()

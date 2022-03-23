@@ -16,5 +16,8 @@ API
     schoolsim.establishment.SchoolSystem
     schoolsim.establishment.SchoolYear
     schoolsim.establishment.Topic
+    schoolsim.lib.database.Database
+    schoolsim.lib.database.DatabaseWriter
+    schoolsim.lib.sqlscripters.SqliteScripter
     schoolsim.simulator
     schoolsim.simulator.Simulator
