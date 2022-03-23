@@ -79,9 +79,9 @@ class Configurator(object):
         logger.info("Configuration, adding CSS to simulation")
         css_parameters = [(1, "CSS de la Réussite", "Français", 0, 0)]
         for css_tuple in css_parameters:
-            (id, name, language, css_sf, css_sv) = css_tuple
+            (css_id, name, language, css_sf, css_sv) = css_tuple
             self.css_definition_list.append(
-                {"id": id, "name": name, "language": language, "success_factor": css_sf,
+                {"id": css_id, "name": name, "language": language, "success_factor": css_sf,
                  "success_variability": css_sv})
 
     def __set_school_default(self):
