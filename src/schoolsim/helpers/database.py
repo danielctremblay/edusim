@@ -9,41 +9,6 @@ from . sqlscripters import SqliteScripter
 
 logger = logging.getLogger(__name__)
 
-
-class Database(object):
-    """Définit un objet représentant la base de données (singleton).
-
-    """
-    cxn = None
-
-    def __init__(self):
-        """Initialise le singleton.
-
-        """
-        # logger.debug("Database, instantiating database handler")
-        pass
-
-    def connect_db(self):
-        """Retourne la connexion à la base de données.
-
-        :return: la connexion à la base de données.
-        """
-        # logger.debug("Database, getting database connexion")
-        if self.cxn is not None:
-            return self.cxn
-
-        cxn_str = "mysql+pymysql://daniel:soleil@localhost:3306/mdm"
-        self.cxn = create_engine(cxn_str)
-        # mysql.connector.connect(
-        #     host="localhost",
-        #     port="3306",
-        #     user="daniel",
-        #     password="soleil",
-        #     database="mdm"
-        # )
-        return self.cxn
-
-
 class DatabaseWriter(object):
     """Définit l'interface de génération de la base de données décisionnelle issue du système scolaire.
 
