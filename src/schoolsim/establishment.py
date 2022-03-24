@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from . agenda import SchoolCalendar
+from .agenda import SchoolCalendar
 
 LANGUAGE_1ST = 'Langue principale'
 LANGUAGE_1ST_ENGLISH = 'Anglais'
@@ -120,8 +120,8 @@ class Group(object):
 
         :param kwargs: les paramètres du groupe scolaire.
         """
-        # logger.info(
-        #     "Group, instantiation group {} in grade {} from parameters".format(kwargs.get("id"), kwargs.get("grade")))
+        logger.debug(
+            "Group, instantiation group {} in grade {} from parameters".format(kwargs.get("id"), kwargs.get("grade")))
         self.id = kwargs.get("id", -1)
         self.grade = kwargs.get("grade", -1)
         self.success_factor = kwargs.get("success_factor", 0)
@@ -208,7 +208,7 @@ class SchoolYear(object):
 
         :param kwargs: les paramètres de l'année scolaire.
         """
-        # logger.info("School Year, instantiating school year {} from parameters".format(kwargs.get("school_year")))
+        logger.debug("School Year, instantiating school year {} from parameters".format(kwargs.get("school_year")))
         self.school_year = kwargs.get("school_year", None)
         self.groups = []
         for group in kwargs.get("group_list", []):
@@ -250,7 +250,7 @@ class School(object):
 
         :param kwargs: les paramètres de l'école.
         """
-        logger.info("School, instantiating school {} from parameters".format(kwargs.get("id")))
+        logger.debug("School, instantiating school {} from parameters".format(kwargs.get("id")))
         self.id = kwargs.get("id", None)
         self.name = kwargs.get("name", None)
         self.language = kwargs.get("language", None)
@@ -318,7 +318,7 @@ class Css(object):
 
         :param kwargs: les paramètres du centre de services scolaires.
         """
-        logger.info("CSS, instantiating CSS {} from parameters".format(kwargs.get("id")))
+        logger.debug("CSS, instantiating CSS {} from parameters".format(kwargs.get("id")))
         self.id = kwargs.get("id", "No css id provided")
         self.name = kwargs.get("name", "No css name provided")
         self.language = kwargs.get("language", "No css language provided")
@@ -391,8 +391,8 @@ class Css(object):
         :param offset: le nombre de tabulations pour l'indentation du texte.
         :return: la description textuelle de l'état du centre de services scolaires.
         """
-        spacer_0 = "\t"*offset
-        spacer_1 = "\t"*(offset + 1)
+        spacer_0 = "\t" * offset
+        spacer_1 = "\t" * (offset + 1)
         details = spacer_0
         details += "CSS id: {}\n".format(self.id) + spacer_1
         details += "CSS name: {}\n".format(self.name) + spacer_1
@@ -412,7 +412,7 @@ class SchoolSystem(object):
         """Initialise le système scolaire à simuler.
 
         """
-        logger.info("Simulation, generating the school system")
+        logger.info("Simulation, simulating the school system")
         self.css = []
 
     def get_css(self, css_id):
@@ -421,7 +421,7 @@ class SchoolSystem(object):
         :param css_id: l'identifiant unique du centre de service
         :return: le centre de service
         """
-        logger.info(("Searching for css {}".format(css_id)))
+        logger.debug(("Searching for css {}".format(css_id)))
         for a_css in self.css:
             if a_css.get_id() == css_id:
                 return a_css

@@ -7,9 +7,8 @@ import numpy as np
 import pandas as pd
 import unidecode as unidecode
 
+from pathlib import Path
 from abc import abstractmethod, ABC
-
-from . helpers.database import Database
 
 PEOPLE_ALL = 'people_all'
 
@@ -58,7 +57,8 @@ class Student(Person):
             dob.month).zfill(2)
         self.uid = unidecode.unidecode(self.uid)  # Remove accents
         self.caseweight = caseweight
-        self.success_factor = np.random.normal(0.78, 0.08, 1)[0] if self.gender == 'f' else np.random.normal(0.68, 0.08, 1)[0]
+        self.success_factor = np.random.normal(0.78, 0.08, 1)[0] if self.gender == 'f' else \
+        np.random.normal(0.68, 0.08, 1)[0]
         self.success_variability = abs(np.random.normal(0, 0.05, 1)[0])
         self.success_year_trend = np.random.normal(0, 0.01, 1)[0]
         self.results = []
@@ -205,7 +205,12 @@ class TeacherPool(Pool):
         """
         super(Pool, self).__init__()
         self.pool = []
-        self.db = Database()
+        self.df_firstname_f = pd.read_csv(Path(__file__).parent.joinpath("data/firstname_f.tsv"), delimiter='\t', header=0,
+                                          names=['firstname', 'gender', 'occurrences'])
+        self.df_firstname_m = pd.read_csv(Path(__file__).parent.joinpath("data/firstname_m.tsv"), delimiter='\t', header=0,
+                                          names=['firstname', 'gender', 'occurrences'])
+        self.df_lastname = pd.read_csv(Path(__file__).parent.joinpath("data/lastname.tsv"), delimiter='\t', header=0,
+                                       names=['lastname', 'occurrences'])
 
     def _Pool__replenish_pool(self):
         # logger.info("Replenishing teacher pool")
@@ -238,26 +243,6 @@ class TeacherPool(Pool):
         age_mean = 45
         age_stddev = 10
 
-        cxn = self.db.connect_db()
-
-        # logger.info("Getting female teacher firstnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT firstname, gender, occurrences FROM firstnames WHERE year = 1980 AND gender = 'f' AND occurrences > 10'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_firstname_f_sql = pd.DataFrame(sql_query, columns=['firstname', 'gender', 'occurrences'])
-
-        # logger.info("Getting male teacher firstnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT firstname, gender, occurrences FROM firstnames WHERE year = 1980 AND gender = 'm' AND occurrences > 10'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_firstname_m_sql = pd.DataFrame(sql_query, columns=['firstname', 'gender', 'occurrences'])
-
-        # logger.info("Getting teacher lastnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT lastname, occurrences FROM `lastnames-qc5000-base`'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_lastname_sql = pd.DataFrame(sql_query, columns=['lastname', 'occurrences'])
-
         # Simulate staff
         # logger.info("Creating teacher dob pool array")
         s_age = np.random.normal(age_mean, age_stddev, pool_size)
@@ -268,18 +253,18 @@ class TeacherPool(Pool):
         s_gender = np.where(s_gender_binomial == 1, 'f', 'm')
 
         # logger.info("Creating teacher lastname pool array")
-        df_lastname = df_lastname_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=True)
-        s_lastname = df_lastname['lastname'].to_numpy()
+        s_lastname = self.df_lastname.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=True)
+        lastnames = s_lastname['lastname'].to_numpy()
 
         # logger.info("Creating teacher firstname pool array")
-        df_firstname_m = df_firstname_m_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
-        df_firstname_f = df_firstname_f_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
-        s_firstname_m = df_firstname_m['firstname'].to_numpy()
-        s_firstname_f = df_firstname_f['firstname'].to_numpy()
+        s_firstname_f = self.df_firstname_f.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
+        s_firstname_m = self.df_firstname_m.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
+        firstnames_m = s_firstname_m['firstname'].to_numpy()
+        firstnames_f = s_firstname_f['firstname'].to_numpy()
 
-        s_firstname = np.where(s_gender == 'f', s_firstname_f, s_firstname_m)
+        firstnames = np.where(s_gender == 'f', firstnames_f, firstnames_m)
 
-        np_people = list(zip(s_firstname, s_lastname, s_gender, s_dob))
+        np_people = list(zip(firstnames, lastnames, s_gender, s_dob))
 
         # logger.info("Creating teacher pool")
         for row in np_people:
@@ -307,30 +292,15 @@ class StudentPool(Pool):
         """
         super(Pool, self).__init__()
         self.pool = []
-        self.db = Database()
+        self.df_firstname_f = pd.read_csv(Path(__file__).parent.joinpath("data/firstname_f.tsv"), delimiter='\t', header=0,
+                                          names=['firstname', 'gender', 'occurrences'])
+        self.df_firstname_m = pd.read_csv(Path(__file__).parent.joinpath("data/firstname_m.tsv"), delimiter='\t', header=0,
+                                          names=['firstname', 'gender', 'occurrences'])
+        self.df_lastname = pd.read_csv(Path(__file__).parent.joinpath("data/lastname.tsv"), delimiter='\t', header=0,
+                                       names=['lastname', 'occurrences'])
 
-    def _Pool__replenish_pool(self, age=None, pool_size=50, gender_f_pct=0.55):
+    def _Pool__replenish_pool(self, age=None, pool_size=50, gender_f_pct=0.53543):
         # logger.info("Replenishing student pool")
-
-        cxn = self.db.connect_db()
-
-        # logger.info("Getting female student firstnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT firstname, gender, occurrences FROM mdm.firstnames WHERE year = 1999 AND gender = 'f' AND occurrences > 10'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_firstname_f_sql = pd.DataFrame(sql_query, columns=['firstname', 'gender', 'occurrences'])
-
-        # logger.info("Getting male student firstnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT firstname, gender, occurrences FROM mdm.firstnames WHERE year = 1999 AND gender = 'm' AND occurrences > 10'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_firstname_m_sql = pd.DataFrame(sql_query, columns=['firstname', 'gender', 'occurrences'])
-
-        # logger.info("Getting student lastnames from database")
-        # noinspection SqlResolve
-        qry = '''SELECT lastname, occurrences FROM mdm.`lastnames-qc5000-base`'''
-        sql_query = pd.read_sql_query(qry, cxn)
-        df_lastname_sql = pd.DataFrame(sql_query, columns=['lastname', 'occurrences'])
 
         # Simulate staff
         # logger.info("Creating student dob pool array with age in 6th grade")
@@ -349,18 +319,18 @@ class StudentPool(Pool):
         s_gender = np.where(s_gender_binomial == 1, 'f', 'm')
 
         # logger.info("Creating student lastname pool array")
-        df_lastname = df_lastname_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=True)
-        s_lastname = df_lastname['lastname'].to_numpy()
+        s_lastname = self.df_lastname.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=True)
+        lastnames = s_lastname['lastname'].to_numpy()
 
         # logger.info("Creating student firstname pool array")
-        df_firstname_m = df_firstname_m_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
-        df_firstname_f = df_firstname_f_sql.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
-        s_firstname_m = df_firstname_m['firstname'].to_numpy()
-        s_firstname_f = df_firstname_f['firstname'].to_numpy()
+        s_firstname_f = self.df_firstname_f.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
+        s_firstname_m = self.df_firstname_m.sample(n=pool_size, replace=True, weights='occurrences', ignore_index=False)
+        firstnames_m = s_firstname_m['firstname'].to_numpy()
+        firstnames_f = s_firstname_f['firstname'].to_numpy()
 
-        s_firstname = np.where(s_gender == 'f', s_firstname_f, s_firstname_m)
+        firstnames = np.where(s_gender == 'f', firstnames_f, firstnames_m)
 
-        np_people = list(zip(s_firstname, s_lastname, s_gender, s_dob))
+        np_people = list(zip(firstnames, lastnames, s_gender, s_dob))
 
         # logger.info("Creating student pool")
         for (firsname, lastname, gender, dob) in np_people:

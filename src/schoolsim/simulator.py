@@ -10,7 +10,7 @@ from pathlib import Path
 
 from . person import TeacherPool, StudentPool
 from . establishment import SchoolSystem
-from . helpers.database import Database, DatabaseWriter
+from . helpers.database import DatabaseWriter
 
 FORMATTER = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=FORMATTER, level=logging.INFO)
@@ -28,7 +28,7 @@ class Simulator(object):
 
         :param kwargs: level, nom, description, auteur, année de début et durée en années.
         """
-        logger.info("Simulation, simulating new school system")
+        logger.info("Simulation, initiating SchoolSim")
         self.id = random.getrandbits(128)
         self.ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         self.type = kwargs.get("sim_type", "Primary school system")
@@ -135,11 +135,10 @@ class SimulatorEngine(object):
         """Initialise le moteur de simulation.
 
         """
-        logger.info("Simulation, instantiating simulation engine")
+        logger.debug("Simulation, instantiating simulation engine")
         self.staff_pool = []
         self.student_pool = []
         self.state = None
-        self.database = Database()
         self.registry = SimulatorRegistry()
         self.system = SchoolSystem()
 
@@ -149,7 +148,7 @@ class SimulatorEngine(object):
         :param kwargs: les paramètres de la simulation.
         :return: le système scolaire.
         """
-        logger.info("Simulation, starting simulation")
+        logger.debug("Simulation, starting simulation")
         random.seed()
         for css_parameters in kwargs.get("css_list", []):
             self.__setup_infrastructure(**dict(css_parameters, start_year=kwargs.get("start_year"),
@@ -162,13 +161,13 @@ class SimulatorEngine(object):
         return self.system
 
     def __setup_infrastructure(self, **kwargs):
-        logger.info("Simulation, generating infrastructure")
+        logger.debug("Simulation, generating infrastructure")
         start_time = time.time()
         self.system.add_css(**kwargs)  # Refer to Configurator for dict structure
-        logger.info("Simulation, infrastructure simulated in {} sec.".format(time.time() - start_time))
+        logger.debug("Simulation, infrastructure simulated in {} sec.".format(time.time() - start_time))
 
     def __simulate_enrolment(self):
-        logger.info("Simulation, simulating student enrolment")
+        logger.debug("Simulation, simulating student enrolment")
         student_cnt = 0
         start_time = time.time()
         for css in self.system.get_csss():
@@ -185,10 +184,10 @@ class SimulatorEngine(object):
                             student = self.registry.get_student(css_id, school_id, group, school_year_name)
                             group.add_student(student)
                             student_cnt += 1
-        logger.info("Simulation, {} students simulated in {} sec.".format(student_cnt, time.time() - start_time))
+        logger.debug("Simulation, {} students simulated in {} sec.".format(student_cnt, time.time() - start_time))
 
     def __simulate_staff(self):
-        logger.info("Simulation, simulating course staff")
+        logger.debug("Simulation, simulating course staff")
         start_time = time.time()
         staff_cnt = 0
         for css in self.system.get_csss():
@@ -211,15 +210,15 @@ class SimulatorEngine(object):
                                 teacher = self.registry.get_specialist(css_id, school_id, school_year_name, topic)
                             topic.set_staff(teacher)
                             staff_cnt += 1
-        logger.info("Simulation, {} staff members simulated in {} sec.".format(staff_cnt, time.time() - start_time))
+        logger.debug("Simulation, {} staff members simulated in {} sec.".format(staff_cnt, time.time() - start_time))
 
     def __simulate_evaluations(self):
-        logger.info("Simulation, simulating evaluations for topics and students")
+        logger.debug("Simulation, simulating evaluations for topics and students")
         start_time = time.time()
         evaluation_cnt = 0
         student_cnt = 0
-        student_trend_male = -0.02 / 7.0  # minus 3% over 5 years
-        student_trend_female = 0.02 / 7.0  # plus 2% over 5 years
+        student_trend_male = -0.03 / 7.0  # minus 3% over 5 years
+        student_trend_female = 0.07 / 7.0  # plus 2% over 5 years
         # TODO scheduling: currently a naïve representation, replace with a real school day schedule
         for css in self.system.get_csss():
             css_sf = css.success_factor
@@ -338,7 +337,7 @@ class SimulatorEngine(object):
                                     logger.warning(
                                         "Simulation, failed to add evaluation")
                 idx_yr += 1  # For trending
-        logger.info(
+        logger.debug(
             "Simulation, {} evaluations for {} students simulated in {} sec.".format(evaluation_cnt, student_cnt,
                                                                                      time.time() - start_time))
 

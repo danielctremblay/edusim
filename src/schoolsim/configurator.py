@@ -76,7 +76,7 @@ class Configurator(object):
 
         :return:
         """
-        logger.info("Configuration, adding CSS to simulation")
+        logger.debug("Configuration, adding CSS to simulation")
         css_parameters = [(1, "CSS de la Réussite", "Français", 0, 0)]
         for css_tuple in css_parameters:
             (css_id, name, language, css_sf, css_sv) = css_tuple
@@ -89,7 +89,7 @@ class Configurator(object):
 
         :return:
         """
-        logger.info("Configuration, adding schools to simulation")
+        logger.debug("Configuration, adding schools to simulation")
         school_parameters = [(1, "École du Bleu Infini", "Français", "primary", 10, "standard", 20, 0, 0)]
         school_definition_list = []
         for css_dict in self.css_definition_list:
@@ -109,7 +109,7 @@ class Configurator(object):
 
         :return:
         """
-        logger.info("Configuration, adding school years with groups and topics to simulation")
+        logger.debug("Configuration, adding school years with groups and topics to simulation")
         # Group tuple : id, grade, size, sucess factor, success variability
         group_parameters = [(1, 1, 20, 0.01, 0.001), (2, 1, 20, -0.01, 0.001), (3, 2, 20, 0.001, 0.0001),
                             (4, 2, 20, 0.001, 0.0001), (5, 3, 22, 0.001, 0.0001), (6, 3, 22, 0.001, 0.0001),

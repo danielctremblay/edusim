@@ -9,41 +9,6 @@ from . sqlscripters import SqliteScripter
 
 logger = logging.getLogger(__name__)
 
-
-class Database(object):
-    """Définit un objet représentant la base de données (singleton).
-
-    """
-    cxn = None
-
-    def __init__(self):
-        """Initialise le singleton.
-
-        """
-        # logger.info("Database, instantiating database handler")
-        pass
-
-    def connect_db(self):
-        """Retourne la connexion à la base de données.
-
-        :return: la connexion à la base de données.
-        """
-        # logger.info("Database, getting database connexion")
-        if self.cxn is not None:
-            return self.cxn
-
-        cxn_str = "mysql+pymysql://daniel:soleil@localhost:3306/mdm"
-        self.cxn = create_engine(cxn_str)
-        # mysql.connector.connect(
-        #     host="localhost",
-        #     port="3306",
-        #     user="daniel",
-        #     password="soleil",
-        #     database="mdm"
-        # )
-        return self.cxn
-
-
 class DatabaseWriter(object):
     """Définit l'interface de génération de la base de données décisionnelle issue du système scolaire.
 
@@ -56,14 +21,14 @@ class DatabaseWriter(object):
         :param system: le système scolaire.
         :param model_type: le type de modèle de données, seul olap est pris en charge présentement.
         """
-        logger.info("Database, writing to database {}".format(db_filepath))
+        logger.debug("Database, writing to database {}".format(db_filepath))
         if model_type == 'olap':
             self.__save_to_olap(db_filepath, system)
         else:
             raise NotImplementedError
 
     def __save_to_olap(self, db, system):
-        logger.info("Saving simulation data to database")
+        logger.debug("Saving simulation data to database")
         start_time = time.time()
 
         # Create database
@@ -81,7 +46,7 @@ class DatabaseWriter(object):
         # -> topics -> teachers
         # -> students -> results
         for css in system.get_csss():
-            logger.info("Database, processing css {}".format(css.id))
+            logger.debug("Database, processing css {}".format(css.id))
             css_id = css.id
             css_name = css.name
             for calendar in css.get_calendars():
@@ -105,15 +70,15 @@ class DatabaseWriter(object):
                     logger.debug("Database, inserted {} calendar dates to database".format(len(values_date)))
 
             for school in css.get_schools():
-                logger.info("Database, processing school {}".format(school.id))
+                logger.debug("Database, processing school {}".format(school.id))
                 school_id = school.id
                 school_name = school.name
                 school_milieu = school.milieu
                 for school_year in school.get_schoolyears():
-                    logger.info("Database, processing school year {}".format(school_year.school_year))
+                    logger.debug("Database, processing school year {}".format(school_year.school_year))
                     school_year_name = school_year.school_year
                     try:
-                        logger.info("Database, processing groups")
+                        logger.debug("Database, processing groups")
                         values_groups = []
                         for group in school_year.get_groups():
                             values_groups.append((group.id, css_id, css_name, school_id, school_name, school_milieu,
@@ -126,7 +91,7 @@ class DatabaseWriter(object):
                         logger.error("Database, could not insert groups")
                     finally:
                         cursor.close()
-                        logger.info("Database, inserted {} groups to database".format(len(values_groups)))
+                        logger.debug("Database, inserted {} groups to database".format(len(values_groups)))
 
                     for group in school_year.get_groups():
                         try:
@@ -156,7 +121,7 @@ class DatabaseWriter(object):
                             cursor.close()
 
                         try:
-                            logger.info("Database, processing students and results")
+                            logger.debug("Database, processing students and results")
                             values_students = []
                             values_results = []
                             for student in group.get_students():
@@ -184,8 +149,8 @@ class DatabaseWriter(object):
                             logger.error("Database, could not insert students or results in database")
                         finally:
                             cursor.close()
-                            logger.info("Database, inserted {} student to database".format(len(values_students)))
-                            logger.info("Database, inserted {} results to database".format(len(values_results)))
+                            logger.debug("Database, inserted {} student to database".format(len(values_students)))
+                            logger.debug("Database, inserted {} results to database".format(len(values_results)))
         try:
             cursor = cxn.cursor()
             stmt = scripter.dml["insert_into_d_evaluations"]
@@ -204,4 +169,4 @@ class DatabaseWriter(object):
             cursor.close()
             cxn.close()
 
-        logger.info("Database created in {} sec.".format(time.time() - start_time))
+        logger.info("SchoolSim database created in {} sec.".format(time.time() - start_time))
