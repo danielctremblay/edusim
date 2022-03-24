@@ -87,7 +87,6 @@ def create_dashboard(db_filepath):
     stmt = scripter.dql['select_topic_grade_headcount']
     df = pd.read_sql(stmt, con=cnx, params=[school_year_max])
     df_topic_grade_headcount = df.pivot(index='topic', columns=['grade'], values='hc').fillna(0)
-    print(df)
 
     # Data: school number of failing students by topic by grade over current year
     stmt = scripter.dql['select_failure_topic_grade']
