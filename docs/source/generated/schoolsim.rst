@@ -1,0 +1,23 @@
+﻿schoolsim
+=========
+
+.. automodule:: schoolsim
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
