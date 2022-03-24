@@ -56,13 +56,14 @@ class DatabaseWriter(object):
         :param system: le système scolaire.
         :param model_type: le type de modèle de données, seul olap est pris en charge présentement.
         """
-        # logger.info("Database, writing to database {}".format(db_filepath))
+        logger.info("Database, writing to database {}".format(db_filepath))
         if model_type == 'olap':
             self.__save_to_olap(db_filepath, system)
         else:
             raise NotImplementedError
 
     def __save_to_olap(self, db, system):
+        logger.info("Saving simulation data to database")
         start_time = time.time()
 
         # Create database
@@ -79,15 +80,15 @@ class DatabaseWriter(object):
         # Hierarchy css -> school -> school year -> group
         # -> topics -> teachers
         # -> students -> results
-        for css in system.get_css_list():
+        for css in system.get_csss():
             logger.info("Database, processing css {}".format(css.id))
             css_id = css.id
             css_name = css.name
-            for calendar in css.get_calendar_list():
+            for calendar in css.get_calendars():
                 try:
                     logger.debug("Database, processing calendar dates")
                     values_date = []
-                    for school_day in calendar.get_school_day_list():
+                    for school_day in calendar.get_schooldays():
                         school_date = school_day.get_date()
                         values_date.append(
                             (school_date, school_date.year, school_date.month,
@@ -103,18 +104,18 @@ class DatabaseWriter(object):
                     cursor.close()
                     logger.debug("Database, inserted {} calendar dates to database".format(len(values_date)))
 
-            for school in css.get_school_list():
+            for school in css.get_schools():
                 logger.info("Database, processing school {}".format(school.id))
                 school_id = school.id
                 school_name = school.name
                 school_milieu = school.milieu
-                for school_year in school.get_school_year_list():
+                for school_year in school.get_schoolyears():
                     logger.info("Database, processing school year {}".format(school_year.school_year))
                     school_year_name = school_year.school_year
                     try:
                         logger.info("Database, processing groups")
                         values_groups = []
-                        for group in school_year.get_group_list():
+                        for group in school_year.get_groups():
                             values_groups.append((group.id, css_id, css_name, school_id, school_name, school_milieu,
                                                   school_year_name, group.grade, group.size, group.enrolment))
                         cursor = cxn.cursor()
@@ -127,12 +128,12 @@ class DatabaseWriter(object):
                         cursor.close()
                         logger.info("Database, inserted {} groups to database".format(len(values_groups)))
 
-                    for group in school_year.get_group_list():
+                    for group in school_year.get_groups():
                         try:
                             logger.debug("Database, processing topics and teachers")
                             values_teachers = []
                             values_topics = []
-                            for topic in group.get_topic_list():
+                            for topic in group.get_topics():
                                 teacher = topic.get_staff()
                                 try:
                                     values_teachers.append((teacher.uid, teacher.uid + "@css.qc.ca", teacher.firstname,
@@ -158,7 +159,7 @@ class DatabaseWriter(object):
                             logger.info("Database, processing students and results")
                             values_students = []
                             values_results = []
-                            for student in group.get_student_list():
+                            for student in group.get_students():
                                 try:
                                     values_students.append(
                                         (student.uid, student.uid + "@css.qc.ca", student.firstname, student.lastname,
@@ -190,9 +191,17 @@ class DatabaseWriter(object):
             stmt = scripter.dml["insert_into_d_evaluations"]
             cursor.execute(stmt)
             cxn.commit()
+            stmt = scripter.dml["insert_into_f_results"]
+            cursor.execute(stmt)
+            cxn.commit()
+            stmt = scripter.dml["drop_s_results"]  # drop staging table
+            cursor.execute(stmt)
+            cxn.commit()
+            cursor.close()
         except:
             logger.error("Could not load d_evaluations")
         finally:
             cursor.close()
             cxn.close()
+
         logger.info("Database created in {} sec.".format(time.time() - start_time))

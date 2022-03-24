@@ -183,5 +183,6 @@ class SqliteScripter(object):
                       AND s_results.css_id = d_groups.css_id AND s_results.school_id = d_groups.school_id AND s_results.school_year = d_groups.school_year AND s_results.group_id = d_groups.group_id
                       AND s_results.student_uid = d_students.uid
                       AND s_results.teacher_uid = d_teachers.uid
-                      AND s_results.topic_id = d_topics.topic_id;'''
+                      AND s_results.topic_id = d_topics.topic_id;''',
+        "drop_s_results": '''DROP TABLE s_results;'''
     }

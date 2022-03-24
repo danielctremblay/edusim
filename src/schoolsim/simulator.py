@@ -10,7 +10,7 @@ from pathlib import Path
 
 from . person import TeacherPool, StudentPool
 from . establishment import SchoolSystem
-from . lib.database import Database, DatabaseWriter
+from . helpers.database import Database, DatabaseWriter
 
 FORMATTER = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=FORMATTER, level=logging.INFO)
@@ -108,8 +108,21 @@ class Simulator(object):
         :param filepath: le chemin vers le fichier de la base de données.
         :return:
         """
-        # TODO make this db specific
-        self.save_to_sql(filepath=filepath)
+        if not filepath:
+            filepath = "~/simulation" + self.ts +  ".sqlite"
+            logger.debug("Creating default database {}".format(filepath))
+
+        try:
+            Path(filepath).unlink()  # Delete if db exists
+        except:
+            pass # ignore if file is present
+
+        try:
+            database = DatabaseWriter(filepath, self.system, model_type='olap')
+        except:
+            logger.error("Could not save OLAP data model to database")
+            traceback.print_exc()
+
 
 class SimulatorEngine(object):
     """Définit le moteur de simulation.

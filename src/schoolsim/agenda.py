@@ -1,6 +1,5 @@
 import datetime
 import dateutil.easter
-
 import logging
 
 logger = logging.getLogger(__name__)

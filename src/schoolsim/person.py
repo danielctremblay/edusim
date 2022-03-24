@@ -2,14 +2,14 @@ import datetime
 import math
 import random
 import re
-from abc import abstractmethod, ABC
+import logging
 import numpy as np
 import pandas as pd
-import logging
-
 import unidecode as unidecode
 
-from . lib.database import Database
+from abc import abstractmethod, ABC
+
+from . helpers.database import Database
 
 PEOPLE_ALL = 'people_all'
 
