@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class HtmlScripter(object):
 
     def __init__(self):
-        logger.info("Scripter, instantiating html scripter")
+        logger.info("Scripter, instantiating html scripter for dashboarding")
 
     css = {
         "title": {"font-size": "150%", "text-align": "center"},
