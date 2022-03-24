@@ -19,5 +19,15 @@ API
     schoolsim.lib.database.Database
     schoolsim.lib.database.DatabaseWriter
     schoolsim.lib.sqlscripters.SqliteScripter
+    schoolsim.person.Person
+    schoolsim.person.Pool
+    schoolsim.person.SpecialistPool
+    schoolsim.person.StudentPool
+    schoolsim.person.TeacherPool
+    schoolsim.person.Specialist
+    schoolsim.person.Student
+    schoolsim.person.Teacher
     schoolsim.simulator
     schoolsim.simulator.Simulator
+    schoolsim.simulator.SimulatorEngine
+    schoolsim.simulator.SimulatorRegistry
