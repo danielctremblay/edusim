@@ -10,8 +10,6 @@ import unidecode as unidecode
 from pathlib import Path
 from abc import abstractmethod, ABC
 
-from .helpers.database import Database
-
 PEOPLE_ALL = 'people_all'
 
 logger = logging.getLogger(__name__)

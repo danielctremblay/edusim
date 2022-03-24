@@ -10,7 +10,7 @@ from pathlib import Path
 
 from . person import TeacherPool, StudentPool
 from . establishment import SchoolSystem
-from . helpers.database import Database, DatabaseWriter
+from . helpers.database import DatabaseWriter
 
 FORMATTER = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=FORMATTER, level=logging.INFO)
@@ -139,7 +139,6 @@ class SimulatorEngine(object):
         self.staff_pool = []
         self.student_pool = []
         self.state = None
-        self.database = Database()
         self.registry = SimulatorRegistry()
         self.system = SchoolSystem()
 
@@ -218,8 +217,8 @@ class SimulatorEngine(object):
         start_time = time.time()
         evaluation_cnt = 0
         student_cnt = 0
-        student_trend_male = -0.02 / 7.0  # minus 3% over 5 years
-        student_trend_female = 0.02 / 7.0  # plus 2% over 5 years
+        student_trend_male = -0.03 / 7.0  # minus 3% over 5 years
+        student_trend_female = 0.07 / 7.0  # plus 2% over 5 years
         # TODO scheduling: currently a naïve representation, replace with a real school day schedule
         for css in self.system.get_csss():
             css_sf = css.success_factor
