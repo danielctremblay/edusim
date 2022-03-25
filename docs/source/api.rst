@@ -16,9 +16,8 @@ API
     schoolsim.establishment.SchoolSystem
     schoolsim.establishment.SchoolYear
     schoolsim.establishment.Topic
-    schoolsim.lib.database.Database
-    schoolsim.lib.database.DatabaseWriter
-    schoolsim.lib.sqlscripters.SqliteScripter
+    schoolsim.helpers.database.DatabaseWriter
+    schoolsim.helpers.sqlscripters.SqliteScripter
     schoolsim.person.Person
     schoolsim.person.Pool
     schoolsim.person.SpecialistPool

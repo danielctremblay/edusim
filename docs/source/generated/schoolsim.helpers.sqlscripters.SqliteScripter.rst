@@ -1,7 +1,7 @@
-﻿schoolsim.lib.sqlscripters.SqliteScripter
-=========================================
+﻿schoolsim.helpers.sqlscripters.SqliteScripter
+=============================================
 
-.. currentmodule:: schoolsim.lib.sqlscripters
+.. currentmodule:: schoolsim.helpers.sqlscripters
 
 .. autoclass:: SqliteScripter
 

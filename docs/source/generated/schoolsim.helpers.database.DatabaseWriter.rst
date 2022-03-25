@@ -1,7 +1,7 @@
-﻿schoolsim.lib.database.DatabaseWriter
-=====================================
+﻿schoolsim.helpers.database.DatabaseWriter
+=========================================
 
-.. currentmodule:: schoolsim.lib.database
+.. currentmodule:: schoolsim.helpers.database
 
 .. autoclass:: DatabaseWriter
 
