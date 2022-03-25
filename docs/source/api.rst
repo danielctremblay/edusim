@@ -4,6 +4,14 @@ API
 .. autosummary::
     :toctree: generated
 
+    dashboarding
+    dashboarding.dashboard_analysis_generator
+    dashboarding.dashboard_details_generator
+    dashboarding.dashboard_monitor_generator
+    dashboarding.spreadsheet_generator
+    dashboarding.helpers.database
+    dashboarding.helpers.htmlscripters
+    dashboarding.helpers.sqlscripters
     schoolsim
     schoolsim.agenda
     schoolsim.agenda.SchoolCalendar
@@ -16,9 +24,8 @@ API
     schoolsim.establishment.SchoolSystem
     schoolsim.establishment.SchoolYear
     schoolsim.establishment.Topic
-    schoolsim.lib.database.Database
-    schoolsim.lib.database.DatabaseWriter
-    schoolsim.lib.sqlscripters.SqliteScripter
+    schoolsim.helpers.database.DatabaseWriter
+    schoolsim.helpers.sqlscripters.SqliteScripter
     schoolsim.person.Person
     schoolsim.person.Pool
     schoolsim.person.SpecialistPool
